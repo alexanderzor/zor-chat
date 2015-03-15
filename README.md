@@ -2,6 +2,7 @@
 simple chat application
 
 Initialize
+
 $ git clone https://github.com/alexanderzor/zor-chat
 
 $ cd zor-chat
