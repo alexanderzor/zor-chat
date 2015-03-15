@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{current_user.username}} - {{session.get("room")}}{% endblock %}
+
+{% block page_content %}
+
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
+{% raw %}
+    <script type="text/javascript" charset="utf-8">
+
+        var socket;
+        $(document).ready(function(){
+            socket = io.connect('http://' + document.domain + ':' + location.port + '/chat');
+            socket.on('connect', function() {
+                socket.emit('joined', {});
+            });
+            socket.on('status', function(data) {
+                $('#lines').append($('<p>').append(data.msg));
+            });
+            socket.on('message', function(data) {
+                $('#lines').append($('<p cols="5">').append(data.msg));
+                $('#lines').get(0).scrollTop = 10000000;
+            });
+            $('#text').keypress(function(e) {
+
+                var code = e.keyCode || e.which;
+                if (code == 13) {
+                    text = $('#text').val();
+                    $('#text').val('');
+                    socket.emit('text', {msg: text});
+                    $(this).parents('form').submit();
+                    return false;
+                }
+            });
+        });</script>
+{% endraw %}
+    <div class="col-md-7 main">
+        <div id="lines" class="well col-md-12 layer">
+        </div>
+        <textarea id="text" placeholder="Enter your message here" class="form-control" rows="3"></textarea>
+    </div>
+    <div class="well col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+            <li class="nav-header"> Users </li>
+            {% for user in users %}
+                <li><a href="{{ url_for('main.user', username=user.username) }}">{{ user.username }}</a></li>
+            {% endfor %}
+            <li><a href="{{ url_for('main.index') }}" onclick="socket.emit('left', {});">Leave this room</a></li>
+        </ul>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}Chat{% endblock %}
+
+{% block page_content %}
+
+<div class="col-md-4 main">
+    <h2>Hello, {% if current_user.is_authenticated() %}{{ current_user.username }}{% else %}Stranger{% endif %}!</h2>
+    {% if current_user.is_authenticated() %}
+        {{ wtf.quick_form(form) }}
+        <br>
+        <div class = 'row'>
+            <ul class="nav-sidebar">
+                {% if  channel %}
+                <li><a href="{{ url_for('main.join') }}"> {{ channel.name }}</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
